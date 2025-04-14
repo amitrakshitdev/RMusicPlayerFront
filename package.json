@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "clsx": "^2.1.1",
+    "motion": "^12.6.5",
     "next": "15.3.0",
     "radix-ui": "^1.2.0",
     "react": "^19.0.0",

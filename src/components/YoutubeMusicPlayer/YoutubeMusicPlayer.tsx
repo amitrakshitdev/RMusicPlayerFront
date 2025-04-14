@@ -8,6 +8,7 @@ import { JSX, useEffect, useMemo, useRef, useState } from "react";
 import YouTube, { YouTubeProps } from "react-youtube";
 import Image from "next/image";
 import { Slider } from "radix-ui";
+import { motion } from "motion/react";
 import playIcon from "./assets/play.svg";
 import pauseIcon from "./assets/pause.svg";
 import nextButtonIcon from "./assets/nextButton.svg";
@@ -70,7 +71,7 @@ export default function YoutubeMusicPlayer(
     const playerRef = useRef(null);
     const intervalRef = useRef<any>("");
     // States
-    const [playerMode, setPlayerMode] = useState<"full" | "bottom">("full");
+    const [playerMode, setPlayerMode] = useState<"full" | "small">("small");
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [songDuration, setSongDuration] = useState<number>(100);
     const [currentSongIndex, setCurrentSongIndex] = useState<number>(0);
@@ -133,7 +134,6 @@ export default function YoutubeMusicPlayer(
                 setIsPlaying(false);
             }
         } else if (event.data === YT.BUFFERING) {
-            
         }
     };
 
@@ -141,11 +141,15 @@ export default function YoutubeMusicPlayer(
         const player = playerRef.current;
         if (!isDraggingSlider && isPlaying && player && player.getCurrentTime) {
             intervalRef.current = setInterval(() => {
-                setCurrentTime(()=> player.getCurrentTime());
+                setCurrentTime(() => player.getCurrentTime());
             }, 1000);
             return () => clearInterval(intervalRef.current);
         }
     }, [isPlaying, isDraggingSlider]);
+
+    function togglePlayerMode() {
+        setPlayerMode((prev) => (prev === "full" ? "small" : "full"));
+    }
 
     function onSliderValueChange(value) {
         setIsDraggingSlider(true);
@@ -172,11 +176,12 @@ export default function YoutubeMusicPlayer(
             const currentTime = player.getCurrentTime();
             if (currentTime < 5) {
                 const prevIndex =
-                    (currentSongIndex - 1 + songsData.length) % songsData.length;
+                    (currentSongIndex - 1 + songsData.length) %
+                    songsData.length;
                 setIsPlaying(false);
                 setCurrentSongIndex(prevIndex);
             } else {
-                console.log("more than 5", currentTime)
+                console.log("more than 5", currentTime);
                 setIsPlaying(false);
                 player.seekTo(0);
                 setCurrentTime(0);
@@ -203,190 +208,429 @@ export default function YoutubeMusicPlayer(
     }
 
     return (
-        <div
-            className={clsx([
-                "fixed inset-0 bg-bgDark/80",
-                "flex flex-col items-center justify-between",
-                "px-4",
-            ])}
-        >
-            <YouTube
-                className="absolute bottom-0 hidden"
-                videoId={songDetails.videoId}
-                opts={opts}
-                onReady={onReady}
-                onStateChange={onPlayerStateChange}
-            />
-            <div className={clsx(["h-10 w-full"])}></div>
-            <div
-                className={clsx([
-                    "album-art-container",
-                    "w-auto h-auto aspect-square max-w-[85%]",
-                    "overflow-hidden rounded-md",
-                ])}
-            >
-                <Image
-                    className={clsx(["object-cover h-full scale-[135%]"])}
-                    src={songDetails.thumbnail.high.url}
-                    alt="Song thumbnail"
-                    width={songDetails.thumbnail.high.width}
-                    height={songDetails.thumbnail.high.height}
-                />
-            </div>
-            <div
-                className={clsx(["song-details-wrapper", "my-4", "max-w-full"])}
-            >
-                <h2
+        <>
+            {playerMode === "full" && (
+                <motion.div
+                    initial={{top: "100%", opacity: 0}}
+                    animate={{top: "0", opacity: 1}}
+                    exit={{top: "100%", opacity: 0}}
                     className={clsx([
-                        "font-bold text-xl max-w-full overflow-hidden",
-                        "whitespace-nowrap overflow-ellipsis",
+                        "bottom-0 h-full",
+                        "fixed inset-0 bg-bgDark/80",
+                        "flex flex-col items-center justify-between",
+                        "px-4",
                     ])}
                 >
-                    {songDetails.title}
-                </h2>
-                <h4 className={clsx(["font-thin text-base font-mullish"])}>
-                    {songDetails.channelTitle}
-                </h4>
-            </div>
-            <div className={clsx(["song-controls-container w-full"])}>
-                <Slider.Root
-                    onValueCommit={(values) => {
-                        setIsDraggingSlider(false);
-                    }}
-                    onValueChange={(values) => onSliderValueChange(values[0])}
-                    value={[currentTime]}
-                    style={{ userSelect: "none", touchAction: "none" }}
-                    className={clsx(["relative flex items-center w-full h-10"])}
-                    defaultValue={[0]}
-                    max={songDuration}
-                    step={1}
-                >
-                    <Slider.Track className="relative w-full h-0.5 bg-white rounded-md">
-                        <Slider.Range className="absolute h-full bg-accent200 rounded-md" />
-                    </Slider.Track>
-                    <Slider.Thumb
-                        className={clsx([
-                            "block w-2.5 h-2.5 rounded-2xl bg-bgLight",
-                        ])}
-                        aria-label="Volume"
+                    <YouTube
+                        className="absolute bottom-0 hidden"
+                        videoId={songDetails.videoId}
+                        opts={opts}
+                        onReady={onReady}
+                        onStateChange={onPlayerStateChange}
                     />
-                </Slider.Root>
-                <div
+                    <div className={clsx(["h-10 w-full"])}></div>
+                    <div
+                        className={clsx([
+                            "album-art-container",
+                            "w-auto h-auto aspect-square max-w-[85%]",
+                            "overflow-hidden rounded-md",
+                        ])}
+                    >
+                        <Image
+                            className={clsx([
+                                "object-cover h-full scale-[135%]",
+                            ])}
+                            src={songDetails.thumbnail.high.url}
+                            alt="Song thumbnail"
+                            width={songDetails.thumbnail.high.width}
+                            height={songDetails.thumbnail.high.height}
+                        />
+                    </div>
+                    <div
+                        className={clsx([
+                            "song-details-wrapper",
+                            "my-4",
+                            "max-w-full",
+                        ])}
+                    >
+                        <h2
+                            className={clsx([
+                                "font-bold text-xl max-w-full overflow-hidden",
+                                "whitespace-nowrap overflow-ellipsis",
+                            ])}
+                        >
+                            {songDetails.title}
+                        </h2>
+                        <h4
+                            className={clsx([
+                                "font-thin text-base font-mullish",
+                            ])}
+                        >
+                            {songDetails.channelTitle}
+                        </h4>
+                    </div>
+                    <div className={clsx(["song-controls-container w-full"])}>
+                        <Slider.Root
+                            onValueCommit={(values) => {
+                                setIsDraggingSlider(false);
+                            }}
+                            onValueChange={(values) =>
+                                onSliderValueChange(values[0])
+                            }
+                            value={[currentTime]}
+                            style={{ userSelect: "none", touchAction: "none" }}
+                            className={clsx([
+                                "relative flex items-center w-full h-10",
+                            ])}
+                            defaultValue={[0]}
+                            max={songDuration}
+                            step={1}
+                        >
+                            <Slider.Track className="relative w-full h-0.5 bg-white rounded-md">
+                                <Slider.Range className="absolute h-full bg-accent200 rounded-md" />
+                            </Slider.Track>
+                            <Slider.Thumb
+                                className={clsx([
+                                    "block w-2.5 h-2.5 rounded-2xl bg-bgLight",
+                                ])}
+                                aria-label="Volume"
+                            />
+                        </Slider.Root>
+                        <div
+                            className={clsx([
+                                "timestamp-container h-5",
+                                "flex items-center justify-between",
+                                "font-mullish",
+                            ])}
+                        >
+                            <div>{formatTime(currentTime)}</div>
+                            <div>{formatTime(songDuration)}</div>
+                        </div>
+                        <div
+                            className={clsx([
+                                "my-3",
+                                "song-control-buttons-container",
+                                "flex justify-between items-center",
+                            ])}
+                        >
+                            <PlayerButton
+                                className={clsx([
+                                    "shuffle-button",
+                                    "flex items-center justify-center",
+                                ])}
+                                disabled={!currentSongIndex}
+                                onClick={() => {
+                                    handlePrevious();
+                                }}
+                            >
+                                <Image
+                                    src={shuffleIcon}
+                                    alt="play button"
+                                    className={clsx(["w-[70%] h-auto"])}
+                                />
+                            </PlayerButton>
+                            <PlayerButton
+                                className={clsx([
+                                    "previous-button",
+                                    "flex items-center justify-center",
+                                ])}
+                                onClick={() => {
+                                    handlePrevious();
+                                }}
+                            >
+                                <Image
+                                    src={prevButoonIcon}
+                                    alt="play button"
+                                    className={clsx(["w-[70%] h-auto"])}
+                                />
+                            </PlayerButton>
+                            <PlayerButton
+                                onClick={() => handlePlayPause()}
+                                className={clsx([
+                                    "flex items-center justify-center",
+                                    "w-20 h-20",
+                                    "bg-accent500",
+                                ])}
+                            >
+                                {isPlaying ? (
+                                    <Image
+                                        src={pauseIcon}
+                                        alt="play button"
+                                        className={clsx(["w-[70%] h-auto"])}
+                                    />
+                                ) : (
+                                    <Image
+                                        src={playIcon}
+                                        alt="play button"
+                                        className={clsx(["w-[50%] h-auto"])}
+                                    />
+                                )}
+                            </PlayerButton>
+                            <PlayerButton
+                                className={clsx([
+                                    "next-button",
+                                    "flex items-center justify-center",
+                                ])}
+                                onClick={() => {
+                                    handleNext();
+                                }}
+                            >
+                                <Image
+                                    src={nextButtonIcon}
+                                    alt="play button"
+                                    className={clsx(["w-[70%] h-auto"])}
+                                />
+                            </PlayerButton>
+                            <PlayerButton
+                                className={clsx([
+                                    "repeat-button",
+                                    "flex items-center justify-center",
+                                ])}
+                                onClick={() => {
+                                    handleNext();
+                                }}
+                            >
+                                <Image
+                                    src={isRepeatingOnce ? repeatOnce : repeat}
+                                    alt="repeat button"
+                                    className={clsx(["w-[70%] h-auto"], {
+                                        "opacity-40": !isLooping,
+                                    })}
+                                />
+                            </PlayerButton>
+                        </div>
+                    </div>
+                    <div className={clsx(["h-16"])}></div>
+                </motion.div>
+            )}
+            {playerMode === "small" && (
+                <motion.div
+                    initial={{opacity:0}}
+                    animate={{opacity:1}}
+                    transition={{type: "tween", ease: "easeInOut"}}
                     className={clsx([
-                        "timestamp-container h-5",
+                        "fixed w-full bg-bgDark/80",
+                        "bottom-0",
+                        "h-20",
                         "flex items-center justify-between",
-                        "font-mullish",
+                        "px-2 sm:px-4",
                     ])}
                 >
-                    <div>{formatTime(currentTime)}</div>
-                    <div>{formatTime(songDuration)}</div>
-                </div>
-                <div
-                    className={clsx([
-                        "my-3",
-                        "song-control-buttons-container",
-                        "flex justify-between items-center",
-                    ])}
-                >
-                    <PlayerButton
-                        className={clsx([
-                            "shuffle-button",
-                            "flex items-center justify-center",
-                        ])}
-                        disabled={!currentSongIndex}
-                        onClick={() => {
-                            handlePrevious();
-                        }}
+                    <YouTube
+                        className="absolute bottom-0 hidden"
+                        videoId={songDetails.videoId}
+                        opts={opts}
+                        onReady={onReady}
+                        onStateChange={onPlayerStateChange}
+                    />
+                    {/* Slider on for mini player */}
+                    <motion.div
+                        className={clsx(["absolute top-0 inset-x-0"])}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ ease: "ease", type: "tween", delay: 0.1 }}
                     >
-                        <Image
-                            src={shuffleIcon}
-                            alt="play button"
-                            className={clsx(["w-[70%] h-auto"])}
-                        />
-                    </PlayerButton>
-                    <PlayerButton
+                        <Slider.Root
+                            onValueCommit={(values) => {
+                                setIsDraggingSlider(false);
+                            }}
+                            onValueChange={(values) =>
+                                onSliderValueChange(values[0])
+                            }
+                            value={[currentTime]}
+                            style={{ userSelect: "none", touchAction: "none" }}
+                            className={clsx([
+                                "absolute flex items-center inset-x-2 h-10 top-0",
+                                "transform -translate-y-1/2",
+                            ])}
+                            defaultValue={[0]}
+                            max={songDuration}
+                            step={1}
+                        >
+                            <Slider.Track className="relative w-full h-0.5 bg-white rounded-md">
+                                <Slider.Range className="absolute h-full bg-accent200 rounded-md" />
+                            </Slider.Track>
+                            <Slider.Thumb
+                                className={clsx([
+                                    "block w-2.5 h-2.5 rounded-2xl bg-bgLight",
+                                ])}
+                                aria-label="Volume"
+                            />
+                        </Slider.Root>
+                    </motion.div>
+
+                    {/* Song Details */}
+                    <motion.div
                         className={clsx([
-                            "previous-button",
-                            "flex items-center justify-center",
+                            "relative",
+                            "song-details-wrapper",
+                            "flex items-center justify-start",
+                            "h-full",
+                            "w-2/3 sm:w-2/5",
+                            "max-w-3/5",
                         ])}
-                        onClick={() => {
-                            handlePrevious();
-                        }}
+                        onClick={()=>{togglePlayerMode()}}
                     >
-                        <Image
-                            src={prevButoonIcon}
-                            alt="play button"
-                            className={clsx(["w-[70%] h-auto"])}
-                        />
-                    </PlayerButton>
-                    <PlayerButton
-                        onClick={() => handlePlayPause()}
-                        className={clsx([
-                            "flex items-center justify-center",
-                            "w-20 h-20",
-                            "bg-accent500",
-                        ])}
-                    >
-                        {isPlaying ? (
+                        {/* Album art */}
+                        <motion.div
+                            className={clsx([
+                                "album-art-container",
+                                "aspect-square",
+                                "h-3/5 w-auto",
+                                "overflow-hidden rounded-sm",
+                                "mr-3"
+                            ])}
+                        >
                             <Image
-                                src={pauseIcon}
+                                className={clsx([
+                                    "object-cover h-full scale-[135%]",
+                                ])}
+                                src={songDetails.thumbnail.high.url}
+                                alt="Song thumbnail"
+                                width={songDetails.thumbnail.high.width}
+                                height={songDetails.thumbnail.high.height}
+                            />
+                        </motion.div>
+                        <div className={clsx(["max-w-7/12"])}>
+                            <h2
+                                className={clsx([
+                                    "font-bold text-base max-w-full overflow-hidden",
+                                    "whitespace-nowrap overflow-ellipsis",
+                                ])}
+                            >
+                                {songDetails.title}
+                            </h2>
+                            <h4
+                                className={clsx([
+                                    "font-thin text-sm font-mullish",
+                                ])}
+                            >
+                                {songDetails.channelTitle}
+                            </h4>
+                        </div>
+                        {/* Time stamp */}
+                        <motion.div
+                            className={clsx([
+                                "song-controls-container w-auto",
+
+                                "hidden md:block",
+                            ])}
+                        >
+                            <div
+                                className={clsx([
+                                    "timestamp-container h-5",
+                                    "flex items-center justify-between",
+                                    "font-mullish text-sm",
+                                ])}
+                            >
+                                <span>{formatTime(currentTime)}</span> &nbsp; /
+                                &nbsp;
+                                <span>{formatTime(songDuration)}</span>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+
+                    {/* Player controls */}
+                    <div
+                        className={clsx([
+                            "my-3",
+                            "w-1/3",
+                            "song-control-buttons-container",
+                            "flex justify-between items-center",
+                            "max-w-36",
+                        ])}
+                    >
+                        <PlayerButton
+                            className={clsx([
+                                "previous-button",
+                            ])}
+                            onClick={() => {
+                                handlePrevious();
+                            }}
+                        >
+                            <Image
+                                src={prevButoonIcon}
                                 alt="play button"
                                 className={clsx(["w-[70%] h-auto"])}
                             />
-                        ) : (
+                        </PlayerButton>
+                        <PlayerButton
+                            onClick={() => handlePlayPause()}
+                            className={clsx(["w-16 h-16"])}
+                        >
+                            {isPlaying ? (
+                                <Image
+                                    src={pauseIcon}
+                                    alt="play button"
+                                    className={clsx(["w-[70%] h-auto"])}
+                                />
+                            ) : (
+                                <Image
+                                    src={playIcon}
+                                    alt="play button"
+                                    className={clsx(["w-[50%] h-auto"])}
+                                />
+                            )}
+                        </PlayerButton>
+                        <PlayerButton
+                            className={clsx(["next-button"])}
+                            onClick={() => {
+                                handleNext();
+                            }}
+                        >
                             <Image
-                                src={playIcon}
+                                src={nextButtonIcon}
                                 alt="play button"
-                                className={clsx(["w-[50%] h-auto"])}
+                                className={clsx(["w-[70%] h-auto"])}
                             />
-                        )}
-                    </PlayerButton>
-                    <PlayerButton
-                        className={clsx([
-                            "next-button",
-                            "flex items-center justify-center",
-                        ])}
-                        onClick={() => {
-                            handleNext();
-                        }}
-                    >
-                        <Image
-                            src={nextButtonIcon}
-                            alt="play button"
-                            className={clsx(["w-[70%] h-auto"])}
-                        />
-                    </PlayerButton>
-                    <PlayerButton
-                        className={clsx([
-                            "repeat-button",
-                            "flex items-center justify-center",
-                        ])}
-                        onClick={() => {
-                            handleNext();
-                        }}
-                    >
-                        <Image
-                            src={isRepeatingOnce ? repeatOnce : repeat}
-                            alt="repeat button"
-                            className={clsx(["w-[70%] h-auto"], {
-                                "opacity-40": !isLooping,
-                            })}
-                        />
-                    </PlayerButton>
-                </div>
-            </div>
-            <div className={clsx(["h-16"])}></div>
-        </div>
+                        </PlayerButton>
+                    </div>
+
+                    {/* Shuffle & Repeat button */}
+                    <div className={clsx(["h-auto", "hidden sm:flex", "w-2/5",
+                        "justify-end"
+                    ])}>
+                        <PlayerButton
+                            className={clsx(["shuffle-button"])}
+                            disabled={!currentSongIndex}
+                            onClick={() => {
+                                handlePrevious();
+                            }}
+                        >
+                            <Image
+                                src={shuffleIcon}
+                                alt="play button"
+                                className={clsx(["w-[70%] h-auto"])}
+                            />
+                        </PlayerButton>
+                        <PlayerButton
+                            className={clsx(["repeat-button"])}
+                            onClick={() => {
+                                handleNext();
+                            }}
+                        >
+                            <Image
+                                src={isRepeatingOnce ? repeatOnce : repeat}
+                                alt="repeat button"
+                                className={clsx(["w-[70%] h-auto"], {
+                                    "opacity-40": !isLooping,
+                                })}
+                            />
+                        </PlayerButton>
+                    </div>
+                </motion.div>
+            )}
+        </>
     );
 }
 
 function formatTime(seconds: number) {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = Math.floor(seconds % 60)
-      .toString()
-      .padStart(2, '0');
+        .toString()
+        .padStart(2, "0");
     return `${minutes}:${remainingSeconds}`;
-  };
+}
 
 function PlayerButton(
     props: React.PropsWithChildren<React.ButtonHTMLAttributes<object>>
@@ -394,7 +638,12 @@ function PlayerButton(
     const { children, className, ...rest } = props;
     return (
         <button
-            className={clsx(className, ["w-10 h-10", "m-0.5", "rounded-full"])}
+            className={clsx(className, [
+                "w-10 h-10",
+                "m-0.5",
+                "rounded-full",
+                "flex items-center justify-center",
+            ])}
             {...rest}
         >
             {children}
