@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Century Gothic";
+  src:
+    local("Century Gothic"),
+    url("../assets/font/CenturyGothic/centurygothic.ttf") format('truetype'),
+    url("../assets//font/CenturyGothic/centurygothic_bold.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: "Mullish";
+  src: local("Mullish"),
+    url("../assets//font/Mulish/Mulish-VariableFont_wght.ttf") format('truetype'),
+    url("../assets//font/Mulish/Mulish-Italic-VariableFont_wght.ttf") format('truetype');
+}
+
+:root {
+  position: relative;
+  --font-mullish: 'Mullish', sans-serif;
+  --font-century-gothic: 'Century Gothic', sans-serif;
+  width: 100%;
+  height: 100%;
+  max-width: 100dvw;
+  max-height: 100dvh;
+  color: var(--color-textLight)
+}
+
+@theme {
+  --font-mullish: 'Mullish', sans-serif;
+  --font-century-gothic: 'Century Gothic', sans-serif;
+  --default-font-family: var(--font-century-gothic);
+  --color-accent100: #A6F3FF;
+  --color-accent200: #44D7DD;
+  --color-accent300: #00C2CB;
+  --color-accent400: #1DB1B7;
+  --color-accent500: #446266;
+  --color-bgLight: #FFFFFF;
+  --color-bgDark: #1E1E1E;
+  --color-textLight: #FFFFFF;
+  --color-textDark: #8A9A9D;
+}
+
+body {
+  height: 100%;
+  width: 100%;
+  overflow-y: scroll;
+}
