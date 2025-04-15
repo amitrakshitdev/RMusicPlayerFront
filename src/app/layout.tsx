@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import clsx from "clsx";
-import MiniMusicPlayer from "@/components/YoutubeMusicPlayer/MiniMusicPlayer";
 import App from "./App";
+import BottomArea from "@/components/common/BottomArea/BottomArea";
 
 export const metadata: Metadata = {
   title: "RMusic",
@@ -22,7 +22,7 @@ export default function RootLayout({
       >
         <App>
           {children}
-          <MiniMusicPlayer />
+         <BottomArea />
         </App>
       </body>
 
