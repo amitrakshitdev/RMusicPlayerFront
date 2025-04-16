@@ -15,6 +15,11 @@
     url("../assets//font/Mulish/Mulish-Italic-VariableFont_wght.ttf") format('truetype');
 }
 
+* {
+  scrollbar-width: auto;
+  scrollbar-color: #ffffff2f transparent;
+}
+
 :root {
   position: relative;
   --font-mullish: 'Mullish', sans-serif;

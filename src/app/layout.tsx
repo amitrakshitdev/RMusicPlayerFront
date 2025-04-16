@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import clsx from "clsx";
 import App from "./App";
-import BottomArea from "@/components/common/BottomArea/BottomArea";
+import BottomArea from "@/components/BottomArea/BottomArea";
+import Header from "@/components/Header/Header";
 
 export const metadata: Metadata = {
   title: "RMusic",
@@ -17,10 +18,10 @@ export default function RootLayout({
 
   return (
     <html lang="en" className={clsx(["bg-bgDark"])}>
-        <body
-        className={`antialiased`}
+        <body className={clsx(`antialiased`, ["flex flex-col"])}
       >
-        <App>
+        <App >
+          <Header />
           {children}
          <BottomArea />
         </App>

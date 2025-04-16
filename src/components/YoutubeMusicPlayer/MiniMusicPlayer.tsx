@@ -77,9 +77,9 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
     const [currentTime, setCurrentTime] = useState(0);
     const [isDraggingSlider, setIsDraggingSlider] = useState(false);
 
-    useEffect(()=>{
-        setCurrentSongIndex(globalCurrIndex || 0)
-    }, [globalCurrIndex]);
+    // useEffect(()=>{
+    //     setCurrentSongIndex(globalCurrIndex || 0)
+    // }, [globalCurrIndex]);
 
     const opts: YouTubeProps["opts"] = {
         height: "0",
@@ -226,15 +226,12 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
                     animate={{ opacity: 1 }}
                     transition={{ type: "tween", ease: "easeInOut" }}
                     className={clsx([
-                        "fixed w-full bg-bgDark/80",
-
+                        "fixed w-full backdrop-blur-sm",
                         "bottom-0",
-
                         "h-20",
-
                         "flex items-center justify-between",
-
                         "px-2 sm:px-4",
+                        "bg-gradient-to-l from-accent300/50 to-accent500/30"
                     ])}
                 >
                     <YouTube
