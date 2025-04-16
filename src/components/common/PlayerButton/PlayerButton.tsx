@@ -8,6 +8,7 @@ export default function PlayerButton(
     return (
         <button
             className={clsx(className, [
+                "cursor-pointer",
                 "w-10 h-10",
                 "m-0.5",
                 "rounded-full",

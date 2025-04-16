@@ -35,7 +35,7 @@ import repeat from "./assets/repeat.svg";
 import repeatOnce from "./assets/repeatOnce.svg";
 
 import { Song, SongInfo } from "@/types/song";
-import { nextSong, prevSong, selectCurrentPlayingIndex, selectCurrentPlaylist } from "@/store/playlistSlice";
+import { nextSong, play, prevSong, selectCurrentPlayingIndex, selectCurrentPlaylist } from "@/store/playlistSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 enum YT {
@@ -71,12 +71,12 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
     const [playerMode, setPlayerMode] = useState<"full" | "small">("small");
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [songDuration, setSongDuration] = useState<number>(100);
-    const [currentSongIndex, setCurrentSongIndex] = useState<number>(0);
+    const [currentSongIndex, setCurrentSongIndex] = useState<number>(globalCurrIndex || 0);
     const [isLooping, setIsLooping] = useState(true);
     const [isRepeatingOnce, setIsRepeatingOnce] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [isDraggingSlider, setIsDraggingSlider] = useState(false);
-
+    const [isBuffering, setIsBuffering] = useState(false);
     // useEffect(()=>{
     //     setCurrentSongIndex(globalCurrIndex || 0)
     // }, [globalCurrIndex]);
@@ -101,22 +101,25 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
 
     const onReady = (event: any) => {
         playerRef.current = event.target;
-
-        const duration = playerRef.current.getDuration();
-
+        if (isPlaying) {
+            event.target.playVideo();
+        }
+        const duration = event.target.getDuration();
         setSongDuration(duration);
     };
 
-    const onPlayerStateChange = (event) => {
+    const onPlayerStateChange = (event: any) => {
         const player = event.target;
-
         if (event.data === YT.PLAYING) {
+            console.log("YT Playing");
+            setIsBuffering(false);
             setIsPlaying(true);
-
             setSongDuration(event.target.getDuration());
         } else if (event.data === YT.PAUSED) {
+            console.log("YT Paused")
             setIsPlaying(false);
         } else if (event.data === YT.ENDED) {
+            console.log("YT ended")
             if (isRepeatingOnce) {
                 event.target.seekTo(0);
 
@@ -134,8 +137,20 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
                 setIsPlaying(false);
             }
         } else if (event.data === YT.BUFFERING) {
+            setIsBuffering(true);
         }
     };
+
+    useEffect(()=>{
+        const player = playerRef?.current;
+        if (player) {
+            setIsPlaying(false);
+            player.seekTo(0);
+            player.playVideo();
+            setCurrentTime(0);
+        }
+        console.log(songDetails);
+    }, [songDetails])
 
     useEffect(() => {
         const player = playerRef.current;
@@ -177,15 +192,12 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
 
     function handlePrevious() {
         const player = playerRef.current;
-
         if (songsData.length > 0 && player) {
             const currentTime = player.getCurrentTime();
-
             if (currentTime < 5) {
                 const prevIndex =
                     (currentSongIndex - 1 + songsData.length) %
                     songsData.length;
-
                 setIsPlaying(false);
                 setCurrentSongIndex(prevIndex);
                 dispatch(prevSong())
@@ -204,12 +216,25 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
 
     function handleNext() {
         const player = playerRef.current;
-
         if (songsData.length > 0 && player) {
             const nextIndex = (currentSongIndex + 1) % songsData.length;
             setIsPlaying(false);
             setCurrentSongIndex(nextIndex);
+            setCurrentTime(0);
             dispatch(nextSong());
+        } else if (player) {
+            player.playVideo();
+            player.seekTo(0);
+            setIsPlaying(true);
+        }
+    }
+
+    function handleNext() {
+        const player = playerRef.current;
+        if (songsData.length > 0 && player) {
+            const nextIndex = (currentSongIndex + 1) % songsData.length;
+            setIsPlaying(false);
+            setCurrentSongIndex(nextIndex);
             setCurrentTime(0);
         } else if (player) {
             player.playVideo();
@@ -220,7 +245,7 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
 
     return (
         <>
-            {songsData ? 
+            {songsData && 
                 <motion.div
                     initial={false}
                     animate={{ opacity: 1 }}
@@ -289,7 +314,7 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
 
                             "song-details-wrapper",
 
-                            "flex items-center justify-start",
+                            "flex items-center justify-between",
 
                             "h-full",
 
@@ -395,19 +420,24 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
                         >
                             <Image
                                 src={prevButoonIcon}
-                                alt="play button"
+                                alt="previous button"
                                 className={clsx(["w-[70%] h-auto"])}
                             />
                         </PlayerButton>
 
                         <PlayerButton
+                            disabled={isBuffering}
                             onClick={() => handlePlayPause()}
-                            className={clsx(["w-16 h-16"])}
+                            className={clsx([
+                                "w-16 h-16",
+                                "disabled:opacity-50",
+                                { "animate-spin": isBuffering }, // Add spinning animation when buffering
+                            ])}
                         >
                             {isPlaying ? (
                                 <Image
                                     src={pauseIcon}
-                                    alt="play button"
+                                    alt="pause button"
                                     className={clsx(["w-[70%] h-auto"])}
                                 />
                             ) : (
@@ -427,7 +457,7 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
                         >
                             <Image
                                 src={nextButtonIcon}
-                                alt="play button"
+                                alt="next button"
                                 className={clsx(["w-[70%] h-auto"])}
                             />
                         </PlayerButton>
@@ -473,7 +503,7 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
                             />
                         </PlayerButton>
                     </div>
-                </motion.div> : <div></div>
+                </motion.div> 
             }
         </>
     );

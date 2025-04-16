@@ -20,8 +20,29 @@ export const playlistSlice = createSlice({
     name: "playlist",
     initialState,
     reducers: {
+        playNow: (state, action: PayloadAction<Song>) => {
+            const newSong = action.payload;
+            const existingIndex = state.currentPlaylist.findIndex(
+                (song) => song.videoId === action.payload.videoId
+            );
+            if (existingIndex !== -1) { // song already in playlist
+                state.currentPlaylist.splice(existingIndex, 1);
+                state.currentPlaylist.unshift(newSong);
+            } else {
+                state.currentPlaylist.unshift(newSong);
+                state.currentPlayingIndex = 0;
+                state.currentSongId = newSong.videoId
+            }
+            
+        },
         queueSong: (state, action: PayloadAction<Song>) => {
             state.currentPlaylist.push(action.payload);
+            const existingIndex = state.currentPlaylist.findIndex(
+                (song) => song.videoId === action.payload.videoId
+            );
+            if (existingIndex !== -1) {
+                state.currentPlaylist.splice(existingIndex, 1);
+            }
         },
         playNext: (state, action: PayloadAction<Song>) => {
             const newSong = action.payload;
@@ -136,6 +157,7 @@ export const playlistSlice = createSlice({
 });
 
 export const {
+    playNow,
     queueSong,
     playNext,
     changePlaylist,
