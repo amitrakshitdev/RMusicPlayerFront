@@ -27,6 +27,7 @@ import {
     prevSong,
     selectCurrentPlayingIndex,
     selectCurrentPlaylist,
+    shufflePlaylist,
 } from "@/store/playlistSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter, usePathname } from "next/navigation";
@@ -67,7 +68,7 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
     const [currentSongIndex, setCurrentSongIndex] = useState<number>(
         globalCurrIndex || 0
     );
-    const [isLooping, setIsLooping] = useState(true);
+    const [isLooping, setIsLooping] = useState(false);
     const [isRepeatingOnce, setIsRepeatingOnce] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [isDraggingSlider, setIsDraggingSlider] = useState(false);
@@ -229,6 +230,14 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
             player.seekTo(0);
             setIsPlaying(true);
         }
+    }
+
+    const handleShuffle = ( ) => {
+        dispatch(shufflePlaylist())
+    }
+
+    function handleRepeat() {
+
     }
 
     return (
@@ -471,10 +480,10 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
                     >
                         <PlayerButton
                             className={clsx(["shuffle-button"])}
-                            disabled={!currentSongIndex}
+                            disabled={songsData.length === 0 }
                             onClick={(ev) => {
                                 ev.stopPropagation();
-                                handlePrevious();
+                                handleShuffle();
                             }}
                         >
                             <Image
@@ -488,7 +497,7 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
                             className={clsx(["repeat-button"])}
                             onClick={(ev) => {
                                 ev.stopPropagation();
-                                handleNext();
+                                handleRepeat();
                             }}
                         >
                             <Image
@@ -626,14 +635,15 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
                                         "shuffle-button",
                                         "flex items-center justify-center",
                                     ])}
-                                    disabled={!currentSongIndex}
-                                    onClick={() => {
-                                        handlePrevious();
+                                    disabled={songsData.length === 0}
+                                    onClick={(ev) => {
+                                        ev.stopPropagation()
+                                        handleShuffle();
                                     }}
                                 >
                                     <Image
                                         src={shuffleIcon}
-                                        alt="play button"
+                                        alt="shuffle button"
                                         className={clsx(["w-[70%] h-auto"])}
                                     />
                                 </PlayerButton>

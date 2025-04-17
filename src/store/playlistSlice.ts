@@ -152,6 +152,20 @@ export const playlistSlice = createSlice({
         pause: (state) => {
             state.isPlaying = false;
         },
+        shufflePlaylist: (state) => {
+            state.currentPlaylist = state.currentPlaylist
+                .map((song) => ({ song, sort: Math.random() }))
+                .sort((a, b) => a.sort - b.sort)
+                .map(({ song }) => song);
+
+            // Reset the currentPlayingIndex to the first song in the shuffled playlist
+            state.currentPlayingIndex = state.currentPlaylist.length > 0 ? 0 : null;
+            state.currentSongId =
+                state.currentPlayingIndex !== null
+                    ? state.currentPlaylist[state.currentPlayingIndex].videoId
+                    : null;
+            state.isPlaying = state.currentPlayingIndex !== null;
+        }
     },
 });
 
@@ -167,6 +181,7 @@ export const {
     removeSongFromQueue,
     play,
     pause,
+    shufflePlaylist
 } = playlistSlice.actions;
 
 export default playlistSlice.reducer;
