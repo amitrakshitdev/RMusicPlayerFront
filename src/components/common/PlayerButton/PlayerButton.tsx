@@ -8,6 +8,7 @@ export default function PlayerButton(
     return (
         <button
             className={clsx(className, [
+                "disabled:opacity-50",
                 "cursor-pointer",
                 "w-10 h-10",
                 "m-0.5",

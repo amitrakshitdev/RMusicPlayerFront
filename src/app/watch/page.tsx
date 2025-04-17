@@ -13,6 +13,7 @@ import downIcon from "@/assets/images/down-icon.svg"
 import SongCard from "@/components/common/SongCards/SongCard";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+
 export default function WatchPage() {
     const router = useRouter();
     const currentPlaylist = useSelector(selectCurrentPlaylist);
@@ -22,12 +23,14 @@ export default function WatchPage() {
         if (currentPlaylist.length === 0) {
             router.replace("/")
         }
-    }, [currentPlaylist])
+    }, [currentPlaylist, router]);
     return (
         <AnimatePresence>
             {show && (
                 <motion.div
+                    key={1}
                     className={clsx([
+                        "hidden sm:flex",
                         "flex-1",
                         "relative",
                         "flex flex-col md:gap-y-4 gap-y-5",
@@ -47,7 +50,7 @@ export default function WatchPage() {
                         </h1>
                         <h2 className={clsx(["text-xl"])}>Up next</h2>
                         <button className={clsx(["absolute right-0 cursor-pointer",
-                            "active:opacity-70 hover:scale-110"
+                            "active:opacity-70 hover:scale-110",
                         ])} onClick={()=> {setShow(false)
                             router.replace("/")
                         }}>
@@ -66,14 +69,16 @@ export default function WatchPage() {
                             height={currentSong?.thumbnail.width || 0}
                             className={clsx([
                                 "w-[250px] h-[250px]",
-                                "md:w-[350px] md:h-[350px]",
-                                "lg:w-[496px] lg:h-[496px]",
+                                "md:w-[300px] md:h-[300px]",
+                                "lg:w-[450px] lg:h-[450px]",
+                                "xl:w-[496px]",
                                 "justify-self-center self-center",
                             ])}
                         />
                         <div
                             className={clsx([
-                                "relative h-[70dvh] flex flex-col items-center overflow-scroll gap-y-2",
+                                "relative h-[70dvh] flex flex-col items-center overflow-y-scroll overflow-x-hidden gap-y-2",
+                                "my-5", "md:my-0"
                             ])}
                         >
                             {currentPlaylist.map((song) => (
@@ -81,8 +86,11 @@ export default function WatchPage() {
                                     key={song.videoId}
                                     data={song}
                                     orientation="row"
-                                    className={clsx(["lg:w-lg",
-                                        "md:w-lg"
+                                    className={clsx([
+                                        "px-4",
+                                        "justify-self-center",
+                                        "w-full",
+                                        "max-w-none",
                                     ])}
                                 />
                             ))}

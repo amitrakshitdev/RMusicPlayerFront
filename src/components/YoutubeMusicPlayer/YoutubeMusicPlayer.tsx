@@ -17,7 +17,10 @@ import prevButoonIcon from "./assets/prevButton.svg";
 import shuffleIcon from "./assets/shuffle.svg";
 import repeat from "./assets/repeat.svg";
 import repeatOnce from "./assets/repeatOnce.svg";
-import { SongInfo } from "@/types/song";
+import { Song, SongInfo } from "@/types/song";
+import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { nextSong, prevSong, selectCurrentPlayingIndex } from "@/store/playlistSlice";
 enum YT {
     UNSTARTED = -1,
     ENDED = 0,
@@ -29,25 +32,32 @@ enum YT {
 
 type YoutubeMusicPlayerProps = {
     videoId?: string;
-    songsData: Array<SongInfo>;
+    songsData: Array<Song>;
 };
 export default function YoutubeMusicPlayer(
     props: YoutubeMusicPlayerProps
 ): JSX.Element {
+    const dispatch = useDispatch();
+    const globalCurrIndex = useSelector(selectCurrentPlayingIndex);
+    const {songsData} = props;
+
     // References
     const playerRef = useRef<any>(null);
     const intervalRef = useRef<any>("");
+
     // States
     const [playerMode, setPlayerMode] = useState<"full" | "small">("full");
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [songDuration, setSongDuration] = useState<number>(100);
-    const [currentSongIndex, setCurrentSongIndex] = useState<number>(0);
+    const [currentSongIndex, setCurrentSongIndex] = useState<number>(globalCurrIndex || 0);
     const [isLooping, setIsLooping] = useState(true);
     const [isRepeatingOnce, setIsRepeatingOnce] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [isDraggingSlider, setIsDraggingSlider] = useState(false);
-    // Props
-    const { songsData } = props;
+    const [isBuffering, setIsBuffering] = useState(false);
+
+    // hooks
+    const router = useRouter();
 
     const opts: YouTubeProps["opts"] = {
         height: "0",
@@ -61,18 +71,23 @@ export default function YoutubeMusicPlayer(
         enablejsapi: 1,
     };
 
+    useEffect(()=> {
+        setCurrentSongIndex(prev => {
+            return globalCurrIndex !== null ? globalCurrIndex : prev;
+        });
+    }, [globalCurrIndex]);
+
     const songDetails = useMemo(() => {
         const song = songsData[currentSongIndex];
-        return {
-            title: song.snippet.title,
-            thumbnail: song.snippet.thumbnails,
-            channelTitle: song.snippet.channelTitle,
-            videoId: song.id.videoId,
-        };
+
+       return song;
     }, [songsData, currentSongIndex]);
 
     const onReady = (event: any) => {
         playerRef.current = event.target;
+        if (isPlaying) {
+            event.target.playVideo();
+        }
         const duration = event.target.getDuration();
         setSongDuration(duration);
     };
@@ -80,13 +95,18 @@ export default function YoutubeMusicPlayer(
     const onPlayerStateChange = (event: any) => {
         const player = event.target;
         if (event.data === YT.PLAYING) {
+            console.log("YT Playing");
+            setIsBuffering(false);
             setIsPlaying(true);
             setSongDuration(event.target.getDuration());
         } else if (event.data === YT.PAUSED) {
+            console.log("YT Paused")
             setIsPlaying(false);
         } else if (event.data === YT.ENDED) {
+            console.log("YT ended")
             if (isRepeatingOnce) {
                 event.target.seekTo(0);
+
                 event.target.playVideo();
             } else if (isLooping && songsData.length > 0) {
                 handleNext();
@@ -101,27 +121,43 @@ export default function YoutubeMusicPlayer(
                 setIsPlaying(false);
             }
         } else if (event.data === YT.BUFFERING) {
+            setIsBuffering(true);
         }
     };
 
+    useEffect(()=>{
+        const player = playerRef?.current;
+        if (player) {
+            setIsPlaying(false);
+            player.seekTo(0);
+            player.playVideo();
+            setCurrentTime(0);
+        }
+        console.log(songDetails);
+    }, [songDetails])
+
     useEffect(() => {
         const player = playerRef.current;
+
         if (!isDraggingSlider && isPlaying && player && player.getCurrentTime) {
             intervalRef.current = setInterval(() => {
                 setCurrentTime(() => player.getCurrentTime());
             }, 1000);
+
             return () => clearInterval(intervalRef.current);
         }
     }, [isPlaying, isDraggingSlider]);
 
     function togglePlayerMode() {
-        setPlayerMode((prev) => (prev === "full" ? "small" : "full"));
+        // The logic for going to watch page
     }
 
-    function onSliderValueChange(value:number) {
+    function onSliderValueChange(value: number) {
         setIsDraggingSlider(true);
+
         if (playerRef.current && "seekTo" in playerRef.current) {
             playerRef.current.seekTo(value);
+
             setCurrentTime(value);
         }
     }
@@ -133,6 +169,7 @@ export default function YoutubeMusicPlayer(
             } else {
                 playerRef.current.playVideo();
             }
+
             setIsPlaying(!isPlaying);
         }
     }, [isPlaying]);
@@ -147,6 +184,7 @@ export default function YoutubeMusicPlayer(
                     songsData.length;
                 setIsPlaying(false);
                 setCurrentSongIndex(prevIndex);
+                dispatch(prevSong())
             } else {
                 console.log("more than 5", currentTime);
                 setIsPlaying(false);
@@ -167,6 +205,7 @@ export default function YoutubeMusicPlayer(
             setIsPlaying(false);
             setCurrentSongIndex(nextIndex);
             setCurrentTime(0);
+            dispatch(nextSong());
         } else if (player) {
             player.playVideo();
             player.seekTo(0);
@@ -182,8 +221,8 @@ export default function YoutubeMusicPlayer(
                     animate={{top: "0", opacity: 1}}
                     exit={{top: "100%", opacity: 0}}
                     className={clsx([
-                        "bottom-0 h-full",
-                        "fixed inset-0 bg-bgDark/80",
+                        "z-10",
+                        "absolute inset-0 bg-bgDark",
                         "flex flex-col items-center justify-between",
                         "px-4",
                     ])}
@@ -207,10 +246,10 @@ export default function YoutubeMusicPlayer(
                             className={clsx([
                                 "object-cover h-full scale-[135%]",
                             ])}
-                            src={songDetails.thumbnail.high.url}
+                            src={songDetails.thumbnail.url}
                             alt="Song thumbnail"
-                            width={songDetails.thumbnail.high.width}
-                            height={songDetails.thumbnail.high.height}
+                            width={songDetails.thumbnail.width}
+                            height={songDetails.thumbnail.height}
                         />
                     </div>
                     <div
@@ -452,10 +491,10 @@ export default function YoutubeMusicPlayer(
                                 className={clsx([
                                     "object-cover h-full scale-[135%]",
                                 ])}
-                                src={songDetails.thumbnail.high.url}
+                                src={songDetails.thumbnail.url}
                                 alt="Song thumbnail"
-                                width={songDetails.thumbnail.high.width}
-                                height={songDetails.thumbnail.high.height}
+                                width={songDetails.thumbnail.width}
+                                height={songDetails.thumbnail.height}
                             />
                         </motion.div>
                         <div className={clsx(["max-w-7/12"])}>
