@@ -35,7 +35,7 @@ export default function YoutubeMusicPlayer(
     props: YoutubeMusicPlayerProps
 ): JSX.Element {
     // References
-    const playerRef = useRef(null);
+    const playerRef = useRef<any>(null);
     const intervalRef = useRef<any>("");
     // States
     const [playerMode, setPlayerMode] = useState<"full" | "small">("full");
@@ -73,11 +73,11 @@ export default function YoutubeMusicPlayer(
 
     const onReady = (event: any) => {
         playerRef.current = event.target;
-        const duration = playerRef.current.getDuration();
+        const duration = event.target.getDuration();
         setSongDuration(duration);
     };
 
-    const onPlayerStateChange = (event) => {
+    const onPlayerStateChange = (event: any) => {
         const player = event.target;
         if (event.data === YT.PLAYING) {
             setIsPlaying(true);
@@ -118,7 +118,7 @@ export default function YoutubeMusicPlayer(
         setPlayerMode((prev) => (prev === "full" ? "small" : "full"));
     }
 
-    function onSliderValueChange(value) {
+    function onSliderValueChange(value:number) {
         setIsDraggingSlider(true);
         if (playerRef.current && "seekTo" in playerRef.current) {
             playerRef.current.seekTo(value);

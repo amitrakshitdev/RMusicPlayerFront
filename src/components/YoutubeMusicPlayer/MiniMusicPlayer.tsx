@@ -65,7 +65,7 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
     const {songsData} = props;
 
     // References
-    const playerRef = useRef(null);
+    const playerRef = useRef<any>(null);
     const intervalRef = useRef<any>("");
 
     // States
@@ -175,7 +175,7 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
         // The logic for going to watch page
     }
 
-    function onSliderValueChange(value) {
+    function onSliderValueChange(value: number) {
         setIsDraggingSlider(true);
 
         if (playerRef.current && "seekTo" in playerRef.current) {
