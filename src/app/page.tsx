@@ -109,7 +109,7 @@ export default function Home() {
                 >
                     <div
                         className={clsx([
-                            "flex flex-col flex-wrap max-h-60 gap-4",
+                            "flex flex-col flex-wrap max-h-72 gap-4",
                         ])}
                     >
                         {playlistData.length > 0 && playlistData[index].map((song) => (

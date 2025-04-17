@@ -24,7 +24,10 @@ export default function SongCard(props: SongCardProps) {
                 ["flex items-center", "cursor-pointer select-none"],
                 `flex-${orientation}`,
                 orientation === "col" && "h-60 w-50",
-                orientation === "row" && "h-16 max-w-60 gap-x-2"
+                orientation === "row" && "h-16 max-w-60 gap-x-2",
+                "hover:scale-[102%] transition-transform duration-100",
+                "active:scale-100",
+                "m-0.5"
             )}
         >
             <AlbumArt

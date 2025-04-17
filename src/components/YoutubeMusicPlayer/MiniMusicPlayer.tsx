@@ -145,6 +145,14 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
         }
     };
 
+    useEffect(()=>{
+        if (isPlaying) {
+            dispatch(play())
+        } else {
+            dispatch(pause())
+        }
+    }, [isPlaying])
+
     useEffect(() => {
         const player = playerRef?.current;
         if (player) {
@@ -162,11 +170,6 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
             intervalRef.current = setInterval(() => {
                 setCurrentTime(() => player.getCurrentTime());
             }, 1000);
-            if (isPlaying) {
-                dispatch(play());
-            } else {
-                dispatch(pause());
-            }
             return () => clearInterval(intervalRef.current);
         }
     }, [isPlaying, isDraggingSlider]);

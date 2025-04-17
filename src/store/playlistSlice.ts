@@ -22,17 +22,22 @@ export const playlistSlice = createSlice({
     reducers: {
         playNow: (state, action: PayloadAction<Song>) => {
             const newSong = action.payload;
+            const currSongId = state.currentSongId;
             const existingIndex = state.currentPlaylist.findIndex(
-                (song) => song.videoId === action.payload.videoId
+                (song) => song.videoId === newSong.videoId
             );
-            if (existingIndex !== -1) { // song already in playlist
+            if (existingIndex !== -1) {
+                // song already in playlist
                 state.currentPlayingIndex = existingIndex;
             } else {
-                state.currentPlaylist.unshift(newSong);
-                state.currentPlayingIndex = 0;
+                const currIndex = state.currentPlaylist.findIndex(
+                    (song) => song.videoId === currSongId
+                );
+                state.currentPlaylist = state.currentPlaylist
+                    .toSpliced(currIndex + 1, 0, newSong);
+                    state.currentPlayingIndex = currIndex + 1;
             }
-            state.currentSongId = newSong.videoId
-            
+            state.currentSongId = newSong.videoId;
         },
         queueSong: (state, action: PayloadAction<Song>) => {
             state.currentPlaylist.push(action.payload);
@@ -159,13 +164,14 @@ export const playlistSlice = createSlice({
                 .map(({ song }) => song);
 
             // Reset the currentPlayingIndex to the first song in the shuffled playlist
-            state.currentPlayingIndex = state.currentPlaylist.length > 0 ? 0 : null;
+            state.currentPlayingIndex =
+                state.currentPlaylist.length > 0 ? 0 : null;
             state.currentSongId =
                 state.currentPlayingIndex !== null
                     ? state.currentPlaylist[state.currentPlayingIndex].videoId
                     : null;
             state.isPlaying = state.currentPlayingIndex !== null;
-        }
+        },
     },
 });
 
@@ -181,7 +187,7 @@ export const {
     removeSongFromQueue,
     play,
     pause,
-    shufflePlaylist
+    shufflePlaylist,
 } = playlistSlice.actions;
 
 export default playlistSlice.reducer;
@@ -204,13 +210,16 @@ export const selectCurrentPlayingSong = (state: {
         : null;
 };
 
-export const selectCurrentSong = createSelector((state: { playlist: PlaylistState})=> state.playlist,
+export const selectCurrentSong = createSelector(
+    (state: { playlist: PlaylistState }) => state.playlist,
     (playlist) => {
         const currentSongId = playlist.currentSongId;
-        const currentSong = playlist.currentPlaylist.find((song)=> song.videoId === currentSongId);
+        const currentSong = playlist.currentPlaylist.find(
+            (song) => song.videoId === currentSongId
+        );
         return currentSong;
     }
-)
+);
 
 export const selectCurrentPlaylist = createSelector(
     (state: { playlist: PlaylistState }) => state.playlist,
