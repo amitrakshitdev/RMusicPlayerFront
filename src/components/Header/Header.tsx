@@ -8,7 +8,7 @@ export default function Header() {
         <div className={clsx(["h-16",
             "items-center",
             "grid grid-cols-3",
-            "px-10"
+            "lg:px-20 px-10"
         ])}>
             <Link href={"/"}>
                 <Image src={rMusicLogo} alt="R Music Logo" className={clsx(["cursor-pointer"])}/>

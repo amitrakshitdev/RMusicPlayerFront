@@ -13,6 +13,8 @@ export default function PlayerButton(
                 "m-0.5",
                 "rounded-full",
                 "flex items-center justify-center",
+                "active:bg-white/20",
+                "hover:scale-110"
             ])}
             {...rest}
         >

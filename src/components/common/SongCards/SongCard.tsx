@@ -1,17 +1,16 @@
 import { playNow } from "@/store/playlistSlice";
 import { Song } from "@/types/song";
 import clsx from "clsx";
-import { motion } from "motion/react";
-import Image from "next/image";
-import { HTMLAttributes } from "react";
 import { useDispatch } from "react-redux";
+import AlbumArt from "../AlbumArt/AlbumArt";
+import { HTMLAttributes } from "react";
 
 type SongCardProps = {
     data: Song;
     orientation?: "row" | "col";
-};
+} & HTMLAttributes<HTMLDivElement>;
 export default function SongCard(props: SongCardProps) {
-    const { data: songData, orientation = "row" } = props;
+    const { data: songData, orientation = "row", className } = props;
     const dispatch = useDispatch();
     function onSongClick() {
         dispatch(playNow(songData));
@@ -19,10 +18,11 @@ export default function SongCard(props: SongCardProps) {
     return (
         <div onClick={onSongClick}
             className={clsx(
+                className,
                 ["flex items-center", "cursor-pointer select-none"],
                 `flex-${orientation}`,
                 orientation === "col" && "h-60 w-50",
-                orientation === "row" && "h-16 w-60 sm:w-[300px] gap-x-2"
+                orientation === "row" && "h-16 w-60 sm:w-[300px] gap-x-2",
             )}
         >
             <AlbumArt
@@ -60,32 +60,3 @@ export default function SongCard(props: SongCardProps) {
     );
 }
 
-type AlbumArtProps = {
-    src: string;
-    width: number;
-    height: number;
-} & HTMLAttributes<HTMLImageElement>;
-
-function AlbumArt(props: AlbumArtProps) {
-    const { src, width, height, className } = props;
-    return (
-        <motion.div
-            className={clsx(
-                [
-                    "album-art-container",
-                    "aspect-square",
-                    "overflow-hidden rounded-sm",
-                ],
-                className
-            )}
-        >
-            <Image
-                className={clsx(["object-cover h-full scale-[135%]"])}
-                src={src}
-                alt="Song album art"
-                width={width}
-                height={height}
-            />
-        </motion.div>
-    );
-}

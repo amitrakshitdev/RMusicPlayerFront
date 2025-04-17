@@ -37,6 +37,7 @@ import repeatOnce from "./assets/repeatOnce.svg";
 import { Song, SongInfo } from "@/types/song";
 import { nextSong, play, prevSong, selectCurrentPlayingIndex, selectCurrentPlaylist } from "@/store/playlistSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 
 enum YT {
     UNSTARTED = -1,
@@ -77,9 +78,9 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
     const [currentTime, setCurrentTime] = useState(0);
     const [isDraggingSlider, setIsDraggingSlider] = useState(false);
     const [isBuffering, setIsBuffering] = useState(false);
-    // useEffect(()=>{
-    //     setCurrentSongIndex(globalCurrIndex || 0)
-    // }, [globalCurrIndex]);
+
+    // hooks
+    const router = useRouter();
 
     const opts: YouTubeProps["opts"] = {
         height: "0",
@@ -92,6 +93,12 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
         },
         enablejsapi: 1,
     };
+
+    useEffect(()=> {
+        setCurrentSongIndex(prev => {
+            return globalCurrIndex !== null ? globalCurrIndex : prev;
+        });
+    }, [globalCurrIndex]);
 
     const songDetails = useMemo(() => {
         const song = songsData[currentSongIndex];
@@ -229,25 +236,15 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
         }
     }
 
-    function handleNext() {
-        const player = playerRef.current;
-        if (songsData.length > 0 && player) {
-            const nextIndex = (currentSongIndex + 1) % songsData.length;
-            setIsPlaying(false);
-            setCurrentSongIndex(nextIndex);
-            setCurrentTime(0);
-        } else if (player) {
-            player.playVideo();
-            player.seekTo(0);
-            setIsPlaying(true);
-        }
-    }
-
     return (
         <>
             {songsData && 
                 <motion.div
                     initial={false}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        router.push("/watch");
+                    }}
                     animate={{ opacity: 1 }}
                     transition={{ type: "tween", ease: "easeInOut" }}
                     className={clsx([
@@ -293,13 +290,14 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
                             max={songDuration}
                             step={1}
                         >
-                            <Slider.Track className="relative w-full h-0.5 bg-white rounded-md">
+                            <Slider.Track className="relative w-full h-1 bg-white rounded-md cursor-pointer">
                                 <Slider.Range className="absolute h-full bg-accent200 rounded-md" />
                             </Slider.Track>
 
                             <Slider.Thumb
                                 className={clsx([
-                                    "block w-2.5 h-2.5 rounded-2xl bg-bgLight",
+                                    "cursor-pointer",
+                                    "block w-4 h-4 rounded-2xl bg-bgLight",
                                 ])}
                                 aria-label="Volume"
                             />
@@ -310,16 +308,13 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
 
                     <motion.div
                         className={clsx([
+                            "sm:pl-5",
+                            "md:pl-10",
                             "relative",
-
                             "song-details-wrapper",
-
                             "flex items-center justify-between",
-
                             "h-full",
-
                             "w-2/3 sm:w-2/5",
-
                             "max-w-3/5",
                         ])}
                         onClick={() => {
@@ -414,7 +409,8 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
                     >
                         <PlayerButton
                             className={clsx(["previous-button"])}
-                            onClick={() => {
+                            onClick={(ev) => {
+                                ev.stopPropagation();
                                 handlePrevious();
                             }}
                         >
@@ -427,7 +423,10 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
 
                         <PlayerButton
                             disabled={isBuffering}
-                            onClick={() => handlePlayPause()}
+                            onClick={(ev) => {
+                                ev.stopPropagation();
+                                handlePlayPause()
+                            }}
                             className={clsx([
                                 "w-16 h-16",
                                 "disabled:opacity-50",
@@ -451,7 +450,8 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
 
                         <PlayerButton
                             className={clsx(["next-button"])}
-                            onClick={() => {
+                            onClick={(ev) => {
+                                ev.stopPropagation();
                                 handleNext();
                             }}
                         >
@@ -477,7 +477,8 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
                         <PlayerButton
                             className={clsx(["shuffle-button"])}
                             disabled={!currentSongIndex}
-                            onClick={() => {
+                            onClick={(ev) => {
+                                ev.stopPropagation();
                                 handlePrevious();
                             }}
                         >
@@ -490,7 +491,8 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
 
                         <PlayerButton
                             className={clsx(["repeat-button"])}
-                            onClick={() => {
+                            onClick={(ev) => {
+                                ev.stopPropagation();
                                 handleNext();
                             }}
                         >
@@ -511,11 +513,8 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
 
 function formatTime(seconds: number) {
     const minutes = Math.floor(seconds / 60);
-
     const remainingSeconds = Math.floor(seconds % 60)
-
         .toString()
-
         .padStart(2, "0");
 
     return `${minutes}:${remainingSeconds}`;
