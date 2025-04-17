@@ -65,7 +65,7 @@ export const playlistSlice = createSlice({
             state.currentPlayingIndex = action.payload.length > 0 ? 0 : null;
             state.currentSongId =
                 action.payload.length > 0 ? action.payload[0].videoId : null;
-            state.isPlaying = action.payload.length > 0; // Start playing if the new playlist is not empty
+            // state.isPlaying = action.payload.length > 0; // Start playing if the new playlist is not empty
         },
         playAtIndex: (state, action: PayloadAction<number>) => {
             if (

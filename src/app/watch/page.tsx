@@ -67,6 +67,7 @@ export default function WatchPage() {
                             src={currentSong?.thumbnail.url || musicIcon}
                             width={currentSong?.thumbnail.width || 0}
                             height={currentSong?.thumbnail.width || 0}
+                            shouldShowPlayAnimation={false}
                             className={clsx([
                                 "w-[250px] h-[250px]",
                                 "md:w-[300px] md:h-[300px]",

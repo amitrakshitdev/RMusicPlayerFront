@@ -23,6 +23,7 @@ import repeatOnce from "./assets/repeatOnce.svg";
 import { Song } from "@/types/song";
 import {
     nextSong,
+    pause,
     play,
     prevSong,
     selectCurrentPlayingIndex,
@@ -152,7 +153,6 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
             player.playVideo();
             setCurrentTime(0);
         }
-        console.log(songDetails);
     }, [songDetails]);
 
     useEffect(() => {
@@ -162,7 +162,11 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
             intervalRef.current = setInterval(() => {
                 setCurrentTime(() => player.getCurrentTime());
             }, 1000);
-
+            if (isPlaying) {
+                dispatch(play());
+            } else {
+                dispatch(pause());
+            }
             return () => clearInterval(intervalRef.current);
         }
     }, [isPlaying, isDraggingSlider]);
@@ -237,7 +241,16 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
     }
 
     function handleRepeat() {
-
+        if (!isLooping && !isRepeatingOnce) {
+            setIsLooping(true);
+            setIsRepeatingOnce(false);
+        } else if (isLooping && !isRepeatingOnce) {
+            setIsLooping(false);
+            setIsRepeatingOnce(true);
+        } else {
+            setIsLooping(false);
+            setIsRepeatingOnce(false);
+        }
     }
 
     return (
@@ -504,7 +517,7 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
                                 src={isRepeatingOnce ? repeatOnce : repeat}
                                 alt="repeat button"
                                 className={clsx(["w-[70%] h-auto"], {
-                                    "opacity-40": !isLooping,
+                                    "opacity-40": !isLooping && !isRepeatingOnce,
                                 })}
                             />
                         </PlayerButton>
@@ -706,8 +719,9 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
                                         "repeat-button",
                                         "flex items-center justify-center",
                                     ])}
-                                    onClick={() => {
-                                        handleNext();
+                                    onClick={(ev) => {
+                                        ev.stopPropagation();
+                                        handleRepeat();
                                     }}
                                 >
                                     <Image
@@ -718,7 +732,7 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
                                         }
                                         alt="repeat button"
                                         className={clsx(["w-[70%] h-auto"], {
-                                            "opacity-40": !isLooping,
+                                            "opacity-40": !isLooping && !isRepeatingOnce,
                                         })}
                                     />
                                 </PlayerButton>

@@ -1,7 +1,7 @@
-import { playNow } from "@/store/playlistSlice";
+import { playNow, selectCurrentSongId } from "@/store/playlistSlice";
 import { Song } from "@/types/song";
 import clsx from "clsx";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AlbumArt from "../AlbumArt/AlbumArt";
 import { HTMLAttributes } from "react";
 
@@ -10,26 +10,29 @@ type SongCardProps = {
     orientation?: "row" | "col";
 } & HTMLAttributes<HTMLDivElement>;
 export default function SongCard(props: SongCardProps) {
+    const currentSongId = useSelector(selectCurrentSongId);
     const { data: songData, orientation = "row", className } = props;
     const dispatch = useDispatch();
     function onSongClick() {
         dispatch(playNow(songData));
     }
     return (
-        <div onClick={onSongClick}
+        <div
+            onClick={onSongClick}
             className={clsx(
                 className,
                 ["flex items-center", "cursor-pointer select-none"],
                 `flex-${orientation}`,
                 orientation === "col" && "h-60 w-50",
-                orientation === "row" && "h-16 max-w-60 gap-x-2",
+                orientation === "row" && "h-16 max-w-60 gap-x-2"
             )}
         >
             <AlbumArt
-                className={clsx(orientation === "row" && "h-full")}
+                className={clsx(orientation === "row" && "h-full", "relative")}
                 src={songData.thumbnail.url}
                 width={songData.thumbnail.width}
                 height={songData.thumbnail.height}
+                shouldShowPlayAnimation = {currentSongId === songData.videoId}
             />
             <div
                 className={clsx([
@@ -43,7 +46,8 @@ export default function SongCard(props: SongCardProps) {
                         "w-full overflow-hidden whitespace-nowrap overflow-ellipsis",
                         "text-base",
                         "my-1",
-                    ])} title={songData.title}
+                    ])}
+                    title={songData.title}
                 >
                     {songData.title}
                 </h3>
@@ -60,4 +64,3 @@ export default function SongCard(props: SongCardProps) {
         </div>
     );
 }
-
