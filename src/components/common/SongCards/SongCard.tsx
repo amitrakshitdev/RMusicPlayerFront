@@ -43,7 +43,7 @@ export default function SongCard(props: SongCardProps) {
                         "w-full overflow-hidden whitespace-nowrap overflow-ellipsis",
                         "text-base",
                         "my-1",
-                    ])}
+                    ])} title={songData.title}
                 >
                     {songData.title}
                 </h3>
@@ -52,6 +52,7 @@ export default function SongCard(props: SongCardProps) {
                         "w-full overflow-hidden whitespace-nowrap overflow-ellipsis",
                         "text-sm opacity-50",
                     ])}
+                    title={songData.channelTitle}
                 >
                     {songData.channelTitle}
                 </h4>

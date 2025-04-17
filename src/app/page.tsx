@@ -2,9 +2,9 @@
 import Section from "@/components/common/Section/Section";
 import SongCard from "@/components/common/SongCards/SongCard";
 import { changePlaylist, selectCurrentPlaylist } from "@/store/playlistSlice";
-import { Song } from "@/types/song";
+import { Song, SongInfo } from "@/types/song";
 import clsx from "clsx";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const playlistNamesWithInfo = [
@@ -44,24 +44,51 @@ const playlistNamesWithInfo = [
 
 export default function Home() {
     const dispatch = useDispatch();
+    const [playlistData, setPlyalistData] = useState<Array<Song[]>>([]);
     const currentPlaylist = useSelector(selectCurrentPlaylist);
     useEffect(() => {
         async function initialDataFetch() {
-            const data = await import("@/data/serchResults.json");
-            const defaultPlaylist: Song[] = data.items.map((song) => {
-                return {
-                    videoId: song.id.videoId,
-                    title: song.snippet.title,
-                    channelTitle: song.snippet.channelTitle,
-                    thumbnail: song.snippet.thumbnails.high,
-                };
-            });
-            dispatch(changePlaylist(defaultPlaylist));
+            const data = await import("@/data/playListDetails.json");
+            if (data.default.length){
+                const defaultPlaylist: Song[] = data.default[0].result.items.map((song: SongInfo) => {
+                    return {
+                        videoId: song.id.videoId,
+                        title: song.snippet.title,
+                        channelTitle: song.snippet.channelTitle,
+                        thumbnail: song.snippet.thumbnails.high,
+                    };
+                });
+                dispatch(changePlaylist(defaultPlaylist));
+            }
+            
         }
         if (currentPlaylist.length < 1) {
             initialDataFetch();
         }
     }, [currentPlaylist, dispatch]);
+
+    useEffect(()=>{
+        async function dataFetch() {
+            const data = await import("@/data/playListDetails.json");
+            if (data.default.length){
+                console.log(data.default);
+                const playListData = data.default.map((playListData)=>{
+                    const modelPlaylist: Song[] = playListData.result.items.map((song: SongInfo) => {
+                        return {
+                            videoId: song.id.videoId,
+                            title: song.snippet.title,
+                            channelTitle: song.snippet.channelTitle,
+                            thumbnail: song.snippet.thumbnails.high,
+                        };
+                    });
+                    
+                    return modelPlaylist;
+                });
+                setPlyalistData(()=> playListData);
+            } 
+        }
+        dataFetch();
+    }, [])
 
     return (
         // <></>
@@ -74,7 +101,7 @@ export default function Home() {
                 "overflow-y-scroll",
             ])}
         >
-            {playlistNamesWithInfo.map((info) => (
+            {playlistNamesWithInfo.map((info, index) => (
                 <Section
                     key={info.id}
                     heading={info.name}
@@ -85,7 +112,7 @@ export default function Home() {
                             "flex flex-col flex-wrap max-h-60 gap-4",
                         ])}
                     >
-                        {currentPlaylist.map((song) => (
+                        {playlistData.length > 0 && playlistData[index].map((song) => (
                             <SongCard key={song.videoId} data={song} orientation={info.orientation as "col" | "row"}/>
                         ))}
                     </div>
