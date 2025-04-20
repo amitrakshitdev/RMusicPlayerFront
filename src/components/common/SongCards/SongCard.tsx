@@ -21,13 +21,16 @@ export default function SongCard(props: SongCardProps) {
             onClick={onSongClick}
             className={clsx(
                 className,
-                ["flex items-center", "cursor-pointer select-none"],
+                ["flex items-center", "cursor-pointer select-none", "p-1.5", "rounded-md"],
                 `flex-${orientation}`,
                 orientation === "col" && "h-60 w-50",
-                orientation === "row" && "h-16 max-w-60 gap-x-2",
-                "hover:scale-[102%] transition-transform duration-100",
-                "active:scale-100",
-                "m-0.5"
+                orientation === "row" && "h-20 max-w-60 gap-x-2",
+                "hover:bg-bgLight/10 transition-colors duration-200",
+                "active:bg-gradient-to-tr from-accent300/20 to-transparent",
+                "m-0.5",
+                currentSongId === songData.videoId && [
+                    "border border-accent100/60 rounded-md bg-gradient-to-tr from-accent300/20 to-transparent",
+                ]
             )}
         >
             <AlbumArt
@@ -35,7 +38,7 @@ export default function SongCard(props: SongCardProps) {
                 src={songData.thumbnail.url}
                 width={songData.thumbnail.width}
                 height={songData.thumbnail.height}
-                shouldShowPlayAnimation = {currentSongId === songData.videoId}
+                shouldShowPlayAnimation={currentSongId === songData.videoId}
             />
             <div
                 className={clsx([

@@ -38,6 +38,7 @@ export interface Song {
     thumbnail: SongInfo["snippet"]["thumbnails"]["high"];
     channelTitle: SongInfo["snippet"]["channelTitle"];
     videoId: SongInfo["id"]["videoId"];
+    id: SongInfo["id"]
     // Add other relevant song properties here (title, artist, etc.)
 }
 

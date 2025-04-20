@@ -1,7 +1,8 @@
 "use client";
+import PlayerButton from "@/components/common/PlayerButton/PlayerButton";
 import Section from "@/components/common/Section/Section";
 import SongCard from "@/components/common/SongCards/SongCard";
-import { changePlaylist, selectCurrentPlaylist } from "@/store/playlistSlice";
+import { changePlaylist, pause, playAtIndex, selectCurrentPlaylist } from "@/store/playlistSlice";
 import { Song, SongInfo } from "@/types/song";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
@@ -49,46 +50,56 @@ export default function Home() {
     useEffect(() => {
         async function initialDataFetch() {
             const data = await import("@/data/playListDetails.json");
-            if (data.default.length){
-                const defaultPlaylist: Song[] = data.default[0].result.items.map((song: SongInfo) => {
-                    return {
-                        videoId: song.id.videoId,
-                        title: song.snippet.title,
-                        channelTitle: song.snippet.channelTitle,
-                        thumbnail: song.snippet.thumbnails.high,
-                    };
-                });
+            if (data.default.length) {
+                const defaultPlaylist: Song[] =
+                    data.default[0].result.items.map((song: SongInfo) => {
+                        return {
+                            videoId: song.id.videoId,
+                            title: song.snippet.title,
+                            channelTitle: song.snippet.channelTitle,
+                            thumbnail: song.snippet.thumbnails.high,
+                            id: song.id
+                        };
+                    });
                 dispatch(changePlaylist(defaultPlaylist));
             }
-            
         }
         if (currentPlaylist.length < 1) {
             initialDataFetch();
         }
     }, [currentPlaylist, dispatch]);
 
-    useEffect(()=>{
+    useEffect(() => {
         async function dataFetch() {
             const data = await import("@/data/playListDetails.json");
-            if (data.default.length){
+            if (data.default.length) {
                 console.log(data.default);
-                const playListData = data.default.map((playListData)=>{
-                    const modelPlaylist: Song[] = playListData.result.items.map((song: SongInfo) => {
-                        return {
-                            videoId: song.id.videoId,
-                            title: song.snippet.title,
-                            channelTitle: song.snippet.channelTitle,
-                            thumbnail: song.snippet.thumbnails.high,
-                        };
-                    });
-                    
+                const playListData = data.default.map((playListData) => {
+                    const modelPlaylist: Song[] = playListData.result.items.map(
+                        (song: SongInfo) => {
+                            return {
+                                videoId: song.id.videoId,
+                                title: song.snippet.title,
+                                channelTitle: song.snippet.channelTitle,
+                                thumbnail: song.snippet.thumbnails.high,
+                                id: song.id
+                            };
+                        }
+                    );
+
                     return modelPlaylist;
                 });
-                setPlyalistData(()=> playListData);
-            } 
+                setPlyalistData(() => playListData);
+            }
         }
         dataFetch();
-    }, [])
+    }, []);
+
+    function handlePlayAll(index: number) {
+        dispatch(pause())
+        dispatch(changePlaylist(playlistData[index]));
+        dispatch(playAtIndex(0));
+    }
 
     return (
         // <></>
@@ -106,15 +117,34 @@ export default function Home() {
                     key={info.id}
                     heading={info.name}
                     subHeading={info.info}
+                    secondaryButton={
+                        <PlayerButton
+                            className={clsx([
+                                "w-max border border-accent100/80 px-4 text-xs text-accent100",
+                                "sm:px-5 text-base",
+                                "md:text-base"
+                            ])}
+                            onClick={() => {handlePlayAll(index)}}
+                        >
+                            Play All
+                        </PlayerButton>
+                    }
                 >
                     <div
                         className={clsx([
-                            "flex flex-col flex-wrap max-h-72 gap-4",
+                            "flex flex-col flex-wrap max-h-72 gap-1",
                         ])}
                     >
-                        {playlistData.length > 0 && playlistData[index].map((song) => (
-                            <SongCard key={song.videoId} data={song} orientation={info.orientation as "col" | "row"}/>
-                        ))}
+                        {playlistData.length > 0 &&
+                            playlistData[index].map((song) => (
+                                <SongCard
+                                    key={song.videoId}
+                                    data={song}
+                                    orientation={
+                                        info.orientation as "col" | "row"
+                                    }
+                                />
+                            ))}
                     </div>
                 </Section>
             ))}
