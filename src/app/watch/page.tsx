@@ -89,8 +89,7 @@ export default function WatchPage() {
                     </div>
                     <div
                         className={clsx([
-                            "flex-1 relative md:grid md:grid-cols-2",
-                            "h-[80%]",
+                            "flex-1 relative md:grid md:grid-cols-2 h-7/8",
                         ])}
                     >
                         <AlbumArt
@@ -108,9 +107,9 @@ export default function WatchPage() {
                         />
                         <div
                             className={clsx([
-                                "relative h-[70dvh] flex flex-col items-center overflow-y-scroll overflow-x-hidden gap-y-2",
+                                "relative sm:h-[40dvh] md:h-full flex flex-col items-center overflow-y-scroll overflow-x-hidden gap-y-2",
                                 "my-5",
-                                "md:my-0",
+                                "md:my-0 md:mb-20",
                             ])}
                         >
                             {currentPlaylist.map((song) => (
@@ -121,8 +120,7 @@ export default function WatchPage() {
                                     className={clsx([
                                         "px-4",
                                         "justify-self-center",
-                                        "w-full",
-                                        "max-w-none",
+                                        "sm:max-w-none w-full",
                                     ])}
                                 />
                             ))}

@@ -36,9 +36,12 @@ export const playlistSlice = createSlice({
                 const currIndex = state.currentPlaylist.findIndex(
                     (song) => song.videoId === currSongId
                 );
-                state.currentPlaylist = state.currentPlaylist
-                    .toSpliced(currIndex + 1, 0, newSong);
-                    state.currentPlayingIndex = currIndex + 1;
+                state.currentPlaylist = state.currentPlaylist.toSpliced(
+                    currIndex + 1,
+                    0,
+                    newSong
+                );
+                state.currentPlayingIndex = currIndex + 1;
             }
             state.currentSongId = newSong.videoId;
         },
@@ -50,23 +53,32 @@ export const playlistSlice = createSlice({
             if (existingIndex !== -1) {
                 state.currentPlaylist.splice(existingIndex, 1);
             }
+            const currSongId = state.currentSongId;
+            state.currentPlayingIndex = state.currentPlaylist.findIndex(
+                (song) => song.videoId === currSongId
+            );
         },
         playNext: (state, action: PayloadAction<Song>) => {
             const newSong = action.payload;
+            const currSongId = state.currentSongId;
             const existingIndex = state.currentPlaylist.findIndex(
                 (song) => song.videoId === newSong.videoId
             );
-
             if (existingIndex !== -1) {
-                state.currentPlayingIndex = existingIndex;
-                state.currentSongId = newSong.videoId;
-                state.isPlaying = true; // Start playing when playNext is called
-            } else {
-                state.currentPlaylist.unshift(newSong); // Add to the beginning of the queue
-                state.currentPlayingIndex = 0;
-                state.currentSongId = newSong.videoId;
-                state.isPlaying = true; // Start playing when playNext is called
+                // song already in playlist
+                state.currentPlaylist = state.currentPlaylist.toSpliced(
+                    existingIndex,
+                    1
+                );
             }
+            const currIndex = state.currentPlaylist.findIndex(
+                (song) => song.videoId === currSongId
+            );
+            state.currentPlaylist = state.currentPlaylist.toSpliced(
+                currIndex + 1,
+                0,
+                newSong
+            );
         },
         changePlaylist: (state, action: PayloadAction<Song[]>) => {
             state.currentPlaylist = action.payload;

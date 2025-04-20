@@ -262,6 +262,7 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
         <>
             {songsData && (
                 <motion.div
+                    title="Click to open the playlist details"
                     initial={false}
                     onClick={(e) => {
                         e.stopPropagation();
@@ -276,6 +277,7 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
                         "flex items-center justify-between",
                         "px-2 sm:px-4",
                         "bg-gradient-to-l from-accent300/50 to-accent500/30",
+                        "cursor-pointer"
                     ])}
                 >
                     <YouTube

@@ -28,7 +28,7 @@
   height: 100%;
   max-width: 100dvw;
   max-height: 100dvh;
-  color: var(--color-textLight)
+  color: var(--color-textLight);
 }
 
 @theme {
@@ -60,5 +60,5 @@
 body {
   height: 100%;
   width: 100%;
-  overflow-y: scroll;
+  overflow-y: hidden;
 }
