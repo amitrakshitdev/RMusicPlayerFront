@@ -1,6 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Song } from "@/types/song";
 import { createSelector } from "reselect";
+import { loadState } from "../utils/localStorage";
+
+const preloadedState = loadState();
 
 export interface PlaylistState {
     currentPlaylist: Song[];
@@ -9,7 +12,7 @@ export interface PlaylistState {
     isPlaying: boolean; // New state for playing status
 }
 
-const initialState: PlaylistState = {
+const initialState: PlaylistState = preloadedState?.playlist || {
     currentPlaylist: [],
     currentPlayingIndex: null,
     currentSongId: null,

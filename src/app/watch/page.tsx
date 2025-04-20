@@ -9,24 +9,45 @@ import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import musicIcon from "@/assets/images/MusicIcon.png";
-import downIcon from "@/assets/images/down-icon.svg"
+import downIcon from "@/assets/images/down-icon.svg";
 import SongCard from "@/components/common/SongCards/SongCard";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import playIcon from "@/assets/images/play.svg";
 
 export default function WatchPage() {
     const router = useRouter();
     const currentPlaylist = useSelector(selectCurrentPlaylist);
     const currentSong = useSelector(selectCurrentSong);
     const [show, setShow] = useState(true);
-    useEffect(()=>{
-        if (currentPlaylist.length === 0) {
-            router.replace("/")
+    const [isMounted, setIsMounted] = useState(false);
+    useEffect(() => {
+        setIsMounted(true);
+        return () => {
+            setIsMounted(false);
+        };
+    }, []);
+    useEffect(() => {
+        if (currentPlaylist.length === 0 && isMounted) {
+            router.replace("/");
         }
-    }, [currentPlaylist, router]);
+    }, [currentPlaylist, router, isMounted, show]);
     return (
         <AnimatePresence>
-            {show && (
+            {!isMounted && (
+                <div
+                    className={clsx([
+                        "absolute inset-0 flex justify-center items-center duration-500",
+                    ])}
+                >
+                    <Image
+                        src={playIcon}
+                        alt="loading icon"
+                        className={clsx(["animate-cc-rotate w-1/5 h-1/5"])}
+                    />
+                </div>
+            )}
+            {isMounted && show && (
                 <motion.div
                     key={1}
                     className={clsx([
@@ -42,19 +63,28 @@ export default function WatchPage() {
                     initial={{ top: "100%", opacity: 0 }}
                     animate={{ top: "0", opacity: 1 }}
                     exit={{ top: "100%", opacity: 0 }}
-                    transition={{ duration: 0.1 }}
+                    transition={{ duration: 0.1, delay: 0.5 }}
                 >
-                    <div className={clsx(["relative flex px-10 items-center justify-around"])}>
+                    <div
+                        className={clsx([
+                            "relative flex px-10 items-center justify-around",
+                        ])}
+                    >
                         <h1 className={clsx(["text-3xl text-center"])}>
                             Now playing
                         </h1>
                         <h2 className={clsx(["text-xl"])}>Up next</h2>
-                        <button className={clsx(["absolute right-0 cursor-pointer",
-                            "active:opacity-70 hover:scale-110",
-                        ])} onClick={()=> {setShow(false)
-                            router.replace("/")
-                        }}>
-                            <Image src={downIcon} alt="donw arrow"/>
+                        <button
+                            className={clsx([
+                                "absolute right-0 cursor-pointer",
+                                "active:opacity-70 hover:scale-110",
+                            ])}
+                            onClick={() => {
+                                setShow(false);
+                                router.replace("/");
+                            }}
+                        >
+                            <Image src={downIcon} alt="donw arrow" />
                         </button>
                     </div>
                     <div
@@ -79,7 +109,8 @@ export default function WatchPage() {
                         <div
                             className={clsx([
                                 "relative h-[70dvh] flex flex-col items-center overflow-y-scroll overflow-x-hidden gap-y-2",
-                                "my-5", "md:my-0"
+                                "my-5",
+                                "md:my-0",
                             ])}
                         >
                             {currentPlaylist.map((song) => (
