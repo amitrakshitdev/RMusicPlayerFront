@@ -333,6 +333,7 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
 
                     <motion.div
                         className={clsx([
+                            "pl-2",
                             "sm:pl-5",
                             "md:pl-10",
                             "relative",
@@ -346,51 +347,55 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
                             togglePlayerMode();
                         }}
                     >
-                        {/* Album art */}
-
-                        <motion.div
-                            className={clsx([
-                                "album-art-container",
-
-                                "aspect-square",
-
-                                "h-3/5 w-auto",
-
-                                "overflow-hidden rounded-sm",
-
-                                "mr-3",
-                            ])}
-                        >
-                            <Image
+                        {/* Album art & Song details*/}
+                        <div className={clsx(["flex w-[70%] items-start h-full"])}>
+                            <motion.div
                                 className={clsx([
-                                    "object-cover h-full scale-[135%]",
-                                ])}
-                                src={songDetails.thumbnail.url}
-                                alt="Song thumbnail"
-                                width={songDetails.thumbnail.width}
-                                height={songDetails.thumbnail.height}
-                            />
-                        </motion.div>
+                                    "album-art-container",
+                                    "self-center",
+                                    "aspect-square",
 
-                        <div className={clsx(["max-w-7/12"])}>
-                            <h2
-                                className={clsx([
-                                    "font-bold text-base max-w-full overflow-hidden",
+                                    "h-3/5 w-auto",
 
-                                    "whitespace-nowrap overflow-ellipsis",
+                                    "overflow-hidden rounded-sm",
+
+                                    "mr-3",
                                 ])}
                             >
-                                {songDetails.title}
-                            </h2>
+                                <Image
+                                    unoptimized
+                                    className={clsx([
+                                        "object-cover h-full scale-[135%]",
+                                    ])}
+                                    src={songDetails.thumbnail.url}
+                                    alt="Song thumbnail"
+                                    width={songDetails.thumbnail.width}
+                                    height={songDetails.thumbnail.height}
+                                />
+                            </motion.div>
+                            <div className={clsx(["max-w-7/12",
+                                "self-center"
+                            ])}>
+                                <h2
+                                    className={clsx([
+                                        "font-bold text-base max-w-full overflow-hidden",
 
-                            <h4
-                                className={clsx([
-                                    "font-thin text-sm font-mullish",
-                                ])}
-                            >
-                                {songDetails.channelTitle}
-                            </h4>
+                                        "whitespace-nowrap overflow-ellipsis",
+                                    ])}
+                                >
+                                    {songDetails.title}
+                                </h2>
+
+                                <h4
+                                    className={clsx([
+                                        "font-thin text-sm font-mullish",
+                                    ])}
+                                >
+                                    {songDetails.channelTitle}
+                                </h4>
+                            </div>
                         </div>
+
 
                         {/* Time stamp */}
 
@@ -574,6 +579,7 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
                             ])}
                         >
                             <Image
+                                unoptimized
                                 className={clsx([
                                     "object-cover h-full scale-[135%]",
                                 ])}

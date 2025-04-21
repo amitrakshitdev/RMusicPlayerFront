@@ -11,7 +11,7 @@ export default function Header() {
             "lg:px-20 px-10"
         ])}>
             <Link href={"/"}>
-                <Image src={rMusicLogo} alt="R Music Logo" className={clsx(["cursor-pointer"])}/>
+                <Image unoptimized src={rMusicLogo} alt="R Music Logo" className={clsx(["cursor-pointer"])}/>
             </Link>
             <input type="text" className={clsx(["w-auto h-8", "border border-accent100/10 rounded-sm",
                 "flex-['1.5 1 1.5']",

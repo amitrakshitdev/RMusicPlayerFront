@@ -34,6 +34,7 @@ function AlbumArt(props: AlbumArtProps) {
             )}
         >
             <Image
+                unoptimized
                 className={clsx(["object-cover h-full scale-[135%]"])}
                 src={src}
                 alt="Song album art"
