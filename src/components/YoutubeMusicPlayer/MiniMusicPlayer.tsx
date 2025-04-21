@@ -32,6 +32,7 @@ import {
 } from "@/store/playlistSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter, usePathname } from "next/navigation";
+import SongCard from "../common/SongCards/SongCard";
 
 enum YT {
     UNSTARTED = -1,
@@ -49,7 +50,6 @@ enum YT {
 
 type YoutubeMusicPlayerProps = {
     videoId?: string;
-
     songsData: Array<Song>;
 };
 
@@ -66,9 +66,7 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
     const [playerMode, setPlayerMode] = useState<"full" | "small">("small");
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [songDuration, setSongDuration] = useState<number>(100);
-    // const [currentSongIndex, setCurrentSongIndex] = useState<number>(
-    //     globalCurrIndex || 0
-    // );
+    const [showUplist, setShowUplist] = useState(false);
     const [isLooping, setIsLooping] = useState(false);
     const [isRepeatingOnce, setIsRepeatingOnce] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
@@ -277,7 +275,7 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
                         "flex items-center justify-between",
                         "px-2 sm:px-4",
                         "bg-gradient-to-l from-accent300/50 to-accent500/30",
-                        "cursor-pointer"
+                        "cursor-pointer",
                     ])}
                 >
                     <YouTube
@@ -535,15 +533,18 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
                     </div>
                 </motion.div>
             )}
+
+            {/* Only for mobile design */}
             {pathname === "/watch" && songsData && (
                 <AnimatePresence>
                     <motion.div
+                        key={0}
                         initial={{ top: "100%", opacity: 0 }}
                         animate={{ top: "0", opacity: 1 }}
                         exit={{ top: "100%", opacity: 0 }}
                         className={clsx([
                             "flex sm:hidden",
-                            "z-10",
+                            "z-[1]",
                             "absolute inset-0",
                             "backdrop:sm",
                             "bg-gradient-to-b from-accent500 to-bgDark",
@@ -753,11 +754,78 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
                                 </PlayerButton>
                             </div>
                         </div>
-                        <div className={clsx(["h-16"])}></div>
+                        <div
+                            className={clsx(["h-16"])}
+                            onClick={() => {
+                                setShowUplist(true);
+                            }}
+                        >
+                            <PlayerButton className={clsx(["w-max px-5"])}>Up next </PlayerButton>
+                        </div>
                     </motion.div>
+                    {showUplist && pathname=="/watch" && <SongList key={1} className={clsx(["sm:hidden z-[1]"])} songsData={songsData} 
+                        exitFn={()=>{setShowUplist(false)}}
+                    />}
                 </AnimatePresence>
             )}
         </>
+    );
+}
+
+type SongsListProps = {
+    songsData: Song[];
+    exitFn: ()=> void;
+} & React.HTMLAttributes<HTMLDivElement>;
+
+function SongList(props: SongsListProps) {
+    const { songsData, className, exitFn } = props;
+    return (
+            <motion.div
+                initial={{ top: "100%", opacity: 0 }}
+                animate={{ top: "0%", opacity: 1 }}
+                exit={{ top: "100%", opacity: 0 }}
+                className={clsx([
+                    className,
+                    "backdrop-blur-md",
+                    "song-upnext-list absolute inset-0 bg-black/50",
+                    "flex flex-col",
+                ])}
+            >
+                <div
+                    className={clsx([
+                        "relative",
+                        "h-1/5 w-full",
+                        "flex items-end justify-center",
+                    ])}
+                >
+                    <PlayerButton
+                        className={clsx(["bg-accent400 w-[80%]"])}
+                        onClick={exitFn}
+                    >
+                        <span>Hide</span>{" "}
+                        <Image src={downIcon} alt="Hide the uplist" />
+                    </PlayerButton>
+                </div>
+                <div
+                    className={clsx([
+                        "h-4/5",
+                        "px-2",
+                        "bg-accent400/20",
+                        "backdrop-blur-2xl",
+                        "overflow-y-scroll",
+                        "rounded-t-xl",
+                    ])}
+                >
+                    {songsData.map((song, idx) => (
+                        <SongCard
+                            className={clsx(["mx-0"])}
+                            key={song.videoId}
+                            data={song}
+                            orientation="row"
+                        />
+                    ))}
+                </div>
+            </motion.div>
     );
 }
 

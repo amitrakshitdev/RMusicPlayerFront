@@ -24,6 +24,7 @@ function ContextMenuWrapper(props: ContextMenuWrapperProps) {
                         "bg-accent300/40",
                         "rounded-md",
                         "backdrop-blur-md",
+                        "z-10"
                     ])}
                 >
                     {menuItems
