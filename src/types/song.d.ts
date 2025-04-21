@@ -38,8 +38,35 @@ export interface Song {
     thumbnail: SongInfo["snippet"]["thumbnails"]["high"];
     channelTitle: SongInfo["snippet"]["channelTitle"];
     videoId: SongInfo["id"]["videoId"];
-    id: SongInfo["id"]
+    id?: SongInfo["id"];
     // Add other relevant song properties here (title, artist, etc.)
 }
 
-export type {SongInfo, Song}
+interface SongSearchResultUO {
+    album: {
+        albumId: string;
+        name: string;
+    };
+    artist: {
+        name: string;
+        artistId: string;
+    };
+    duration: number;
+    name: string;
+    thumbnails: {
+        url: string;
+        width: number;
+        height: number;
+    }[];
+    type: string;
+    videoId: string;
+}
+
+export type SearchResultUnofficial = {
+    albumResults: unknown;
+    songResults: SongSearchResultUO[];
+    playlistResults: unknown;
+    artistResults: unknown;
+};
+
+export type { SongInfo, Song, SearchResultUnofficial };

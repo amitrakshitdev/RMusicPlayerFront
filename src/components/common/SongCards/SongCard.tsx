@@ -1,3 +1,4 @@
+"use client"
 import {
     playNow,
     selectCurrentSongId,
@@ -70,7 +71,7 @@ export default function SongCard(props: SongCardProps) {
     
     return (
         <ContextMenuWrapper
-            className={clsx([className, "relative", "max-w-64", "sm:max-w-72"])}
+            className={clsx([className, "max-w-64", "sm:max-w-72"])}
             menuItems={menuItems}
         >
             <div
@@ -107,7 +108,7 @@ export default function SongCard(props: SongCardProps) {
                     className={clsx([
                         "relative",
                         orientation === "col" && "w-full",
-                        orientation === "row" && "w-3/4",
+                        orientation === "row" && "w-[70%]",
                     ])}
                 >
                     <h3

@@ -25,17 +25,17 @@ function AlbumArt(props: AlbumArtProps) {
     return (
         <motion.div
             className={clsx(
+                className,
                 [
                     "album-art-container",
                     "aspect-square",
                     "overflow-hidden rounded-sm",
                 ],
-                className
             )}
         >
             <Image
                 unoptimized
-                className={clsx(["object-cover h-full scale-[135%]"])}
+                className={clsx(["object-cover h-full w-full scale-[135%]"])}
                 src={src}
                 alt="Song album art"
                 width={width}
