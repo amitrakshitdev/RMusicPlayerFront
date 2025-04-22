@@ -6,19 +6,26 @@ import SearchInput from "../common/SearchInput/SearchInput";
 
 export default function Header() {
     return (
-        <div className={clsx(["h-16",
-            "items-center",
-            "grid grid-cols-3",
-            "lg:px-20 px-10"
-        ])}>
+        <div
+            className={clsx([
+                "h-16",
+                "items-center",
+                "grid grid-cols-3",
+                "px-2 lg:px-20",
+            ])}
+        >
             <Link href={"/"}>
-                <Image unoptimized src={rMusicLogo} alt="R Music Logo" className={clsx(["cursor-pointer"])}/>
+                <Image
+                    unoptimized
+                    src={rMusicLogo}
+                    alt="R Music Logo"
+                    className={clsx(["cursor-pointer"])}
+                />
             </Link>
             <SearchInput />
             <div className={clsx(["justify-self-end"])}>
-                Login
+                Login-WIP
             </div>
         </div>
-    )
+    );
 }
-

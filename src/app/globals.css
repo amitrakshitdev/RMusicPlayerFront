@@ -44,8 +44,9 @@
   --color-bgDark: #1E1E1E;
   --color-textLight: #FFFFFF;
   --color-textDark: #8A9A9D;
-  --animate-cc-rotate: cc-rotate 0.4s linear running infinite;
-@keyframes cc-rotate {
+  --animate-pluse: pluse 0.4s linear running infinite;
+  
+@keyframes pulse {
   0% {
     transform: scale(1);
   } 50% {

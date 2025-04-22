@@ -127,7 +127,7 @@ export default function Home() {
                     <Image
                         src={playIcon}
                         alt="loading icon"
-                        className={clsx(["animate-cc-rotate w-1/5 h-1/5"])}
+                        className={clsx(["animate-pulse w-1/5 h-1/5"])}
                     />
                 </div>
             )}

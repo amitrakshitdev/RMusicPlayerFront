@@ -15,21 +15,21 @@ export default function SearchInput() {
             const searchQuery = inputRef.current.value.trim();
             const searchUrl = `${hostname}/search?q=${encodeURIComponent(searchQuery)}`;
             router.push(searchUrl);
+            inputRef.current.blur();
         } else {
             // alert("Please enter a valid search query.");
         }
     }
     return (
-        <form className={clsx(["flex-['1.5 1 1.5']"])} onSubmit={(ev)=> {handleSubmit(ev)}}>
+        <form onSubmit={(ev)=> {handleSubmit(ev)}}>
             <input
                 ref={inputRef}
                 type="text"
                 className={clsx([
                     "w-full h-8",
                     "border border-accent100/10 rounded-sm",
-                    ,
                     "bg-gradient-to-r from-accent500/10 to-accent400/5",
-                    "pl-4",
+                    "pl-1 sm:pl-3 md:pl-4",
                     "text-white/80",
                     "outline-0",
                     "font-century-gothic",
