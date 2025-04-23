@@ -102,7 +102,6 @@ function MiniMusicPlayer(props: YoutubeMusicPlayerProps): JSX.Element {
     }, [songsData, globalCurrIndex]);
 
     const onReady = React.useCallback((event: any) => {
-        console.log("Player Ready....", event);
         setIsPlayerReady(true);
         playerRef.current = event.target;
         if (isPlaying) {

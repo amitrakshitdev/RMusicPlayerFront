@@ -51,7 +51,6 @@ const playlistNamesWithInfo = [
 //   console.log(playlistNamesWithInfo);
 
 export default function Home() {
-    console.log("Home rendered")
     const dispatch = useDispatch();
     const [playlistData, setPlyalistData] = useState<Array<Song[]>>([]);
     const [isMounted, setIsMounted] = useState(false);
@@ -82,7 +81,6 @@ export default function Home() {
         async function dataFetch() {
             const data = await import("@/data/playListDetails.json");
             if (data.default.length) {
-                console.log(data.default);
                 const playListData = data.default.map((playListData) => {
                     const modelPlaylist: Song[] = playListData.result.items.map(
                         (song: SongInfo) => {

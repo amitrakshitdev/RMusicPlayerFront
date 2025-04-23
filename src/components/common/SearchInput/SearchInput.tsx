@@ -11,17 +11,17 @@ export default function SearchInput() {
         ev.preventDefault();
         ev.stopPropagation();
         if (inputRef.current && inputRef.current.value.trim()) {
-            const hostname = window.location.origin;
+            // const hostname = window.location.origin;
             const searchQuery = inputRef.current.value.trim();
-            const searchUrl = `${hostname}/search?q=${encodeURIComponent(searchQuery)}`;
-            router.push(searchUrl);
+            // const searchUrl = `${hostname}/search?q=${encodeURIComponent(searchQuery)}`;
+            router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
             inputRef.current.blur();
         } else {
             // alert("Please enter a valid search query.");
         }
     }
     return (
-        <form onSubmit={(ev)=> {handleSubmit(ev)}}>
+        <form onSubmit={handleSubmit}>
             <input
                 ref={inputRef}
                 type="text"
