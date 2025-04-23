@@ -51,6 +51,7 @@ const playlistNamesWithInfo = [
 //   console.log(playlistNamesWithInfo);
 
 export default function Home() {
+    console.log("Home rendered")
     const dispatch = useDispatch();
     const [playlistData, setPlyalistData] = useState<Array<Song[]>>([]);
     const [isMounted, setIsMounted] = useState(false);
@@ -133,7 +134,7 @@ export default function Home() {
             )}
             <div
                 className={clsx([
-                    "relative",
+                    "absolute h-full w-full",
                     "flex flex-col md:gap-y-4 gap-y-5",
                     "flex-1 bg-gradient-to-b from-accent500/0 to-accent200/5",
                     "px-5 py-3 lg:px-20 lg:pt-16 pb-28",

@@ -5,7 +5,7 @@ import {
     selectCurrentSong,
 } from "@/store/playlistSlice";
 import clsx from "clsx";
-import { motion, AnimatePresence } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import musicIcon from "@/assets/images/MusicIcon.png";
@@ -37,7 +37,7 @@ export default function WatchPage() {
             {!isMounted && (
                 <div
                     className={clsx([
-                        "absolute inset-0 flex justify-center items-center duration-500",
+                        "absolute h-full w-full flex justify-center items-center duration-500",
                     ])}
                 >
                     <Image
@@ -47,23 +47,22 @@ export default function WatchPage() {
                     />
                 </div>
             )}
-            {isMounted && show && (
+            {show && isMounted && (
                 <motion.div
                     key={1}
                     className={clsx([
                         "hidden sm:flex",
-                        "flex-1",
-                        "relative",
+                        "absolute h-full w-full",
                         "flex flex-col md:gap-y-4 gap-y-5",
-                        "flex-1 bg-gradient-to-b from-accent500/0 to-accent200/5",
+                        "flex-1 bg-gradient-to-b from-bgDark/90 to-accent500/50 backdrop-blur-md",
                         "px-5 lg:px-20 pb-24 pt-10",
                         "overflow-y-scroll",
                         "border-t border-accent100/20",
                     ])}
                     initial={{ top: "100%", opacity: 0 }}
-                    animate={{ top: "0", opacity: 1 }}
-                    exit={{ top: "100%", opacity: 0 }}
-                    transition={{ duration: 0.1, delay: 0.5 }}
+                    animate={{ top: "0%", opacity: 1 }}
+                    exit={{ "top" : "100%", opacity: 0 }}
+                    transition={{ duration: 0.3 }}
                 >
                     <div
                         className={clsx([
@@ -81,7 +80,10 @@ export default function WatchPage() {
                             ])}
                             onClick={() => {
                                 setShow(false);
-                                router.replace("/");
+                                const timeOut = setTimeout(()=>{
+                                    router.back();
+                                    clearTimeout(timeOut);
+                                }, 300)
                             }}
                         >
                             <Image src={downIcon} alt="donw arrow" />
